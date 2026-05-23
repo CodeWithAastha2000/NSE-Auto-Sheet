@@ -54,7 +54,7 @@ def fetch_bhavcopy_for_date(date_obj):
                     df = df[~df[sym_col].astype(str).str.contains(filter_keywords, case=False, na=False)]
                     
                     df_top = df.sort_values(by=vol_col, ascending=False).head(250)
-                    return df_top[[sym_col, vol_col, close_col]].values.tolist()
+                    return df_top[[sym_col, vol_col, close_col, , value_col]].values.tolist()
         return None
     except:
         return None
