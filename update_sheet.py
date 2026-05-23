@@ -54,7 +54,20 @@ def fetch_bhavcopy_for_date(date_obj):
                     df = df[~df[sym_col].astype(str).str.contains(filter_keywords, case=False, na=False)]
                     
                     df_top = df.sort_values(by=vol_col, ascending=False).head(250)
-                    return df_top[[sym_col, vol_col, close_col, , value_col]].values.tolist()
+                    # Add traded value column
+value_col = 'TtlTradgVal'
+for c in ['TtlTradgVal', 'TotTrdVal', 'TOTTRDVAL']:
+    if c in df.columns:
+        value_col = c
+        break
+
+# Filter top 250
+df_top = df.sort_values(by=vol_col, ascending=False).head(250)
+
+# Create custom stock value column
+df_top['StockValue'] = df_top[close_col] * df_top[vol_col]
+
+return df_top[[sym_col, vol_col, close_col, value_col, 'StockValue']].values.tolist()
         return None
     except:
         return None
@@ -75,8 +88,8 @@ for i in range(5):
 
 # 4. Update Sheet
 if data_to_insert:
-    worksheet.batch_clear(['A2:C251'])
-    worksheet.update('A2', data_to_insert)
+worksheet.batch_clear(['A2:E251'])
+worksheet.update('A2', data_to_insert)
     ist_now = (datetime.utcnow() + timedelta(hours=5, minutes=30)).strftime('%d-%b %H:%M')
     status_msg = f"Data Date: {fetched_date_str} | Last Update: {ist_now} (IST)"
     worksheet.update('K2', [[status_msg]])
