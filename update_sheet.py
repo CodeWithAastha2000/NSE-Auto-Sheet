@@ -16,7 +16,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 
 # अपनी गूगल शीट की ID यहाँ डालें (URL के बीच का हिस्सा)
-spreadsheet_id = "1DpEJjwCZVU2UHfPmfbwEvISvyCL5wa-JAY2I10pdACs" 
+spreadsheet_id = "यहाँ_अपनी_शीट_की_ID_डालें" 
 worksheet = client.open_by_key(spreadsheet_id).worksheet("Top 250 Stocks")
 
 # 2. NSE UDiFF Data Fetcher
@@ -54,20 +54,7 @@ def fetch_bhavcopy_for_date(date_obj):
                     df = df[~df[sym_col].astype(str).str.contains(filter_keywords, case=False, na=False)]
                     
                     df_top = df.sort_values(by=vol_col, ascending=False).head(250)
-                    # Add traded value column
-value_col = 'TtlTradgVal'
-for c in ['TtlTradgVal', 'TotTrdVal', 'TOTTRDVAL']:
-    if c in df.columns:
-        value_col = c
-        break
-
-# Filter top 250
-df_top = df.sort_values(by=vol_col, ascending=False).head(250)
-
-# Create custom stock value column
-df_top['StockValue'] = df_top[close_col] * df_top[vol_col]
-
-return df_top[[sym_col, vol_col, close_col, value_col, 'StockValue']].values.tolist()
+                    return df_top[[sym_col, vol_col, close_col]].values.tolist()
         return None
     except:
         return None
@@ -88,8 +75,8 @@ for i in range(5):
 
 # 4. Update Sheet
 if data_to_insert:
-worksheet.batch_clear(['A2:E251'])
-worksheet.update('A2', data_to_insert)
+    worksheet.batch_clear(['A2:C251'])
+    worksheet.update('A2', data_to_insert)
     ist_now = (datetime.utcnow() + timedelta(hours=5, minutes=30)).strftime('%d-%b %H:%M')
     status_msg = f"Data Date: {fetched_date_str} | Last Update: {ist_now} (IST)"
     worksheet.update('K2', [[status_msg]])
